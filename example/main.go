@@ -34,7 +34,7 @@ func main() {
 		DarkGreen().
 		Box(50, 3, 40, 3, "").
 		BoxCustom(
-			30, 4, 40, 2,
+			30, 8, 40, 2,
 			"Test",
 			"█", "█", "█",
 			"█", "░", "█",
@@ -49,6 +49,8 @@ func main() {
 		Fill(ga.Yellow, -3, -3, 3, 3).
 		Print()
 
+	ga.New().Box(1, 1, 20, 3, "INPUT").Print()
+	ga.New().Box(1, 5, 50, 5, "OUTPUT").Print()
 	// Block the main goroutine until a signal is received
 	<-signalChannel
 

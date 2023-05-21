@@ -15,7 +15,6 @@ func getTermSize() (int, int) {
 	if err != nil {
 		return -1, -1
 	}
-
 	return width, height
 }
 
@@ -32,7 +31,7 @@ func Abs(x, y, w, h int) (int, int, int, int) {
 	if y < 0 {
 		y = th + y - h + 2
 	}
-	y2 := y + h
+	y2 := y + h - 1
 	return x, y, x2, y2
 }
 
