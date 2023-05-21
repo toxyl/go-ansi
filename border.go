@@ -1,6 +1,7 @@
 package goansi
 
 import (
+	"math"
 	"strings"
 
 	"github.com/toxyl/go-ansi/utils"
@@ -13,7 +14,7 @@ func (as *ANSIString) BoxCustom(x, y, w, h int, label, topLeft, top, topRight, l
 
 	x, y, w, h = utils.TermWindow.SelectArea(x, y, w, h)
 
-	as.MoveTo(x, y).Text(topLeft).Text(top).Bold(label).Text(strings.Repeat(top, w-3-len(label))).Text(topRight).Ln()
+	as.MoveTo(x, y).Text(topLeft).Text(top).Bold(label).Text(strings.Repeat(top, int(math.Max(float64(w-3-len(label)), 0.0)))).Text(topRight).Ln()
 	for i := 0; i < h-2; i++ {
 		y++
 		as.MoveTo(x, y).Text(left).Text(strings.Repeat(center, w-2)).Text(right).Ln()
