@@ -12,6 +12,7 @@ func (as *ANSIString) BoxCustom(x, y, w, h int, label, topLeft, top, topRight, l
 	bottom = bottomLeft + strings.Repeat(bottom, w-2) + bottomRight + "\n"
 	center = left + strings.Repeat(center, w-2) + right
 	as.MoveTo(x, y).Text(top)
+	yt := y
 	y++
 	for y < y2 {
 		as.MoveTo(x, y).Text(center)
@@ -19,7 +20,7 @@ func (as *ANSIString) BoxCustom(x, y, w, h int, label, topLeft, top, topRight, l
 	}
 	as.MoveTo(x, y2).Text(bottom)
 	if label != "" {
-		as.MoveTo(x+1, y-h).Bold(" " + label + " ")
+		as.MoveTo(x+1, yt).Bold(" " + label + " ")
 	}
 
 	return as
