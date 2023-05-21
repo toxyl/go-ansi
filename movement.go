@@ -1,6 +1,10 @@
 package goansi
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/toxyl/go-ansi/utils"
+)
 
 func (as *ANSIString) MoveHome() *ANSIString {
 	as.posX = 0
@@ -9,14 +13,8 @@ func (as *ANSIString) MoveHome() *ANSIString {
 }
 
 func (as *ANSIString) MoveTo(x, y int) *ANSIString {
-	as.posX = x
-	as.posY = y
-	if x < 0 {
-		as.posX = as.termWidth + x
-	}
-	if y < 0 {
-		as.posY = as.termHeight + y + 1
-	}
+	as.posX = utils.AbsX(x)
+	as.posY = utils.AbsY(y)
 	return as.appendPrefix(fmt.Sprintf("%d;%dH", as.posY, as.posX))
 }
 
