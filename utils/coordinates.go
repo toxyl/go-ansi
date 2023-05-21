@@ -3,6 +3,10 @@ package utils
 import (
 	"math"
 	"os"
+	"os/exec"
+	"runtime"
+	"strconv"
+	"strings"
 	"time"
 
 	"golang.org/x/term"
@@ -118,10 +122,41 @@ func (tw *TerminalWindow) SetCursorY(y int) {
 	tw.Cursor.Y = y
 }
 
-func (tw *TerminalWindow) Update() {
+func getWindowSize() (int, int, error) {
+	if runtime.GOOS == "windows" {
+		cmd := exec.Command("cmd", "/c", "mode", "con")
+		cmd.Stdin = os.Stdin
+		out, err := cmd.Output()
+		if err != nil {
+			return 0, 0, err
+		}
+		lines := strings.Split(string(out), "\r\n")
+		var cols, rows int
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if strings.HasPrefix(line, "Columns:") {
+				line = strings.TrimPrefix(line, "Columns:")
+				line = strings.TrimSpace(line)
+				cols, _ = strconv.Atoi(line)
+			}
+			if strings.HasPrefix(line, "Lines:") {
+				line = strings.TrimPrefix(line, "Lines:")
+				line = strings.TrimSpace(line)
+				rows, _ = strconv.Atoi(line)
+			}
+		}
+		return cols, rows, nil
+	}
 	fd := int(os.Stdin.Fd())
+	return termGetSize(fd)
+}
 
-	w, h, err := term.GetSize(fd)
+func termGetSize(fd int) (int, int, error) {
+	return term.GetSize(fd)
+}
+
+func (tw *TerminalWindow) Update() {
+	w, h, err := getWindowSize()
 	if err != nil {
 		return
 	}
