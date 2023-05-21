@@ -19,6 +19,7 @@ func main() {
 	go func() {
 		screen := ga.New()
 		log := []string{
+			fmt.Sprintf("Dimensions: %d x %d.", ga.W(), ga.H()),
 			"Elvis has entered the building.",
 			"The building has collapsed.",
 			"Elvis is dead, time to panic!",
