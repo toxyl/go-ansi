@@ -44,8 +44,8 @@ func main() {
 				// Box(4, 4, 40, 3, "Hello").
 				// DarkGreen().
 				// Box(7, 6, -6, 0, "OUTPUT").
-				Box(5, 2, -5, 3, "INPUT").
-				LogBox(5, 5, -5, -1, "Log", log, false).
+				Box(1, 1, -1, 3, "INPUT").
+				LogBox(1, 5, -1, -1, "Log", log, false).
 				// Yellow().
 				// BoxCustom(
 				// 	30, 8, 40, 5,
@@ -60,7 +60,7 @@ func main() {
 				// Fill(ga.Red, -1, -1, 3, 3).
 				// Fill(ga.Green, -2, -2, 3, 3).
 				// Fill(ga.Yellow, -3, -3, 3, 3).
-				MoveTo(8, 3).
+				MoveTo(2, 2).
 				CursorShow().
 				Print()
 

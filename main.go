@@ -6,12 +6,10 @@ import (
 )
 
 type ANSIString struct {
-	tokens     []string
-	style      *style
-	termWidth  int
-	termHeight int
-	posX       int
-	posY       int
+	tokens []string
+	style  *style
+	posX   int
+	posY   int
 }
 
 func (as *ANSIString) Clear() *ANSIString {
@@ -43,7 +41,6 @@ func (as *ANSIString) appendPrefix(str string) *ANSIString {
 }
 
 func New() *ANSIString {
-	w, h := getTermSize()
 	as := &ANSIString{
 		tokens: []string{},
 		style: &style{
@@ -59,8 +56,6 @@ func New() *ANSIString {
 			underline:     false,
 			strikeThrough: false,
 		},
-		termWidth:  w,
-		termHeight: h,
 	}
 	return as
 }
