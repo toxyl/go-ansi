@@ -16,6 +16,7 @@ type ANSIString struct {
 
 func (as *ANSIString) Clear() *ANSIString {
 	as.style.clear()
+	as.tokens = []string{}
 	return as.Text()
 }
 
@@ -25,6 +26,7 @@ func (as *ANSIString) String() string {
 
 func (as *ANSIString) Print() {
 	fmt.Print(as.String())
+	as.Clear()
 }
 
 func (as *ANSIString) Println() {

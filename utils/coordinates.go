@@ -1,52 +1,168 @@
 package utils
 
 import (
+	"math"
 	"os"
+	"time"
 
 	"golang.org/x/term"
 )
 
-func getTermSize() (int, int) {
-	// Retrieve the file descriptor for the standard input (0)
+var (
+	TermWindow *TerminalWindow
+)
+
+type Point struct {
+	X int
+	Y int
+}
+
+func NewPoint(x, y int) *Point {
+	p := &Point{
+		X: x,
+		Y: y,
+	}
+	return p
+}
+
+type Rect struct {
+	P1 *Point
+	P2 *Point
+}
+
+func (r *Rect) order() {
+	p1 := r.P1
+	p2 := r.P2
+
+	minX := math.Min(float64(p1.X), float64(p2.X))
+	maxX := math.Max(float64(p1.X), float64(p2.X))
+	minY := math.Min(float64(p1.Y), float64(p2.Y))
+	maxY := math.Max(float64(p1.Y), float64(p2.Y))
+
+	r.P1.X = int(minX)
+	r.P2.X = int(maxX)
+
+	r.P1.Y = int(minY)
+	r.P2.Y = int(maxY)
+}
+
+func (r *Rect) Width() int {
+	r.order()
+	return r.P2.X - r.P1.X
+}
+
+func (r *Rect) Height() int {
+	r.order()
+	return r.P2.Y - r.P1.Y
+}
+
+func (r *Rect) SetWidth(w int) {
+	r.order()
+	r.P2.X = r.P1.X + w
+}
+
+func (r *Rect) SetHeight(h int) {
+	r.order()
+	r.P2.Y = r.P1.Y + h
+}
+
+func (r *Rect) SetX(x int) {
+	w := r.Width()
+	r.P1.X = x
+	r.SetWidth(w)
+}
+
+func (r *Rect) SetY(y int) {
+	h := r.Height()
+	r.P1.Y = y
+	r.SetHeight(h)
+}
+
+type TerminalWindow struct {
+	Rect   *Rect
+	Cursor *Point
+}
+
+func (tw *TerminalWindow) W() int { return tw.Rect.Width() }
+func (tw *TerminalWindow) H() int { return tw.Rect.Height() }
+
+func (tw *TerminalWindow) X() int { return tw.Cursor.X }
+func (tw *TerminalWindow) Y() int { return tw.Cursor.Y }
+
+func (tw *TerminalWindow) SetCursorX(x int) {
+	if x < 0 {
+		x = tw.Rect.Width() + x
+	}
+	tw.Cursor.X = x
+}
+
+func (tw *TerminalWindow) SetCursorY(y int) {
+	if y < 0 {
+		y = tw.Rect.Height() + y
+	}
+	tw.Cursor.Y = y
+}
+
+func (tw *TerminalWindow) Update() {
 	fd := int(os.Stdin.Fd())
 
-	// Get the terminal size
-	width, height, err := term.GetSize(fd)
+	w, h, err := term.GetSize(fd)
 	if err != nil {
-		return -1, -1
+		return
 	}
-	return width, height
+	tw.Rect.P1 = NewPoint(0, 0)
+	tw.Rect.P2 = NewPoint(w, h)
 }
 
-// Abs converts one-based coordinates to zero-based coordinates.
-// Negative x/y values will be calculated as offset from the w/h values.
-// Returns the resulting absolute x, y, x2 and y2 coordinates.
-func Abs(x, y, w, h int) (int, int, int, int) {
-	tw, th := getTermSize()
-	if x < 0 {
-		x = tw + x - w + 2
+func (tw *TerminalWindow) SelectArea(x1, y1, w, h int) (x int, y int, width int, height int) {
+	if x1 < 0 {
+		x1 = tw.W() + x1 - 2
 	}
-	x2 := x + w - 1
+	if y1 < 0 {
+		y1 = tw.H() + y1 - 2
+	}
 
-	if y < 0 {
-		y = th + y - h + 2
+	x2 := x1 + w
+	if w < 0 {
+		x2 = tw.W() + w
+	} else if w == 0 {
+		x2 = tw.W()
 	}
-	y2 := y + h - 1
-	return x, y, x2, y2
+
+	y2 := y1 + h
+	if h < 0 {
+		y2 = tw.H() + h
+	} else if h == 0 {
+		y2 = tw.H()
+	}
+
+	r := &Rect{
+		P1: &Point{
+			X: x1,
+			Y: y1,
+		},
+		P2: &Point{
+			X: x2,
+			Y: y2,
+		},
+	}
+	r.order()
+	return r.P1.X, r.P1.Y, r.Width(), r.Height()
 }
 
-func AbsX(x int) int {
-	if x < 0 {
-		tw, _ := getTermSize()
-		x = tw + x + 2
+func init() {
+	TermWindow = &TerminalWindow{
+		Rect: &Rect{
+			P1: &Point{},
+			P2: &Point{},
+		},
+		Cursor: &Point{},
 	}
-	return x
-}
-
-func AbsY(y int) int {
-	if y < 0 {
-		_, th := getTermSize()
-		y = th + y + 2
-	}
-	return y
+	TermWindow.Update()
+	go func() {
+		for {
+			time.Sleep(3 * time.Second)
+			TermWindow.Update()
+		}
+	}()
 }

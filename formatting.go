@@ -1,5 +1,9 @@
 package goansi
 
+func (as *ANSIString) Ln() *ANSIString {
+	return as.add("\n")
+}
+
 func (as *ANSIString) Text(text ...string) *ANSIString {
 	return as.add(as.style.render(text...))
 }
