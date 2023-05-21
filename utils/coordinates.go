@@ -9,7 +9,22 @@ import (
 )
 
 var (
-	TermWindow *TerminalWindow
+	TermWindow = &TerminalWindow{
+		Rect: &Rect{
+			P1: &Point{
+				X: 0,
+				Y: 0,
+			},
+			P2: &Point{
+				X: 0,
+				Y: 0,
+			},
+		},
+		Cursor: &Point{
+			X: 0,
+			Y: 0,
+		},
+	}
 )
 
 type Point struct {
@@ -151,13 +166,6 @@ func (tw *TerminalWindow) SelectArea(x1, y1, w, h int) (x int, y int, width int,
 }
 
 func init() {
-	TermWindow = &TerminalWindow{
-		Rect: &Rect{
-			P1: &Point{},
-			P2: &Point{},
-		},
-		Cursor: &Point{},
-	}
 	TermWindow.Update()
 	go func() {
 		for {
