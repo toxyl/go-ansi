@@ -15,11 +15,11 @@ func (as *ANSIString) BoxCustom(x, y, w, h int, label, topLeft, top, topRight, l
 	x, y, w, h = utils.TermWindow.SelectArea(x, y, w, h)
 
 	as.MoveTo(x, y).Text(topLeft).Text(top).Bold(label).Text(strings.Repeat(top, int(math.Max(float64(w-3-len(label)), 0.0)))).Text(topRight).Ln()
-	for i := 0; i < h-2; i++ {
-		y++
-		as.MoveTo(x, y).Text(left).Text(strings.Repeat(center, w-2)).Text(right).Ln()
-	}
 	y++
+	for i := 0; i < h-2; i++ {
+		as.MoveTo(x, y).Text(left).Text(strings.Repeat(center, w-2)).Text(right).Ln()
+		y++
+	}
 	as.MoveTo(x, y).Text(bottomLeft).Text(strings.Repeat(bottom, w-2)).Text(bottomRight)
 
 	return as
@@ -31,6 +31,29 @@ func (as *ANSIString) Box(x, y, w, h int, label string) *ANSIString {
 		"│", " ", "│",
 		"└", "─", "┘",
 	)
+}
+
+func (as *ANSIString) Input(x, y, w int, label, text string) *ANSIString {
+	h := 3
+	x, y, w, h = utils.TermWindow.SelectArea(x, y, w, h)
+	as.Box(x, y, w, h, label)
+
+	x += 2
+	y++
+	w -= 4
+	h -= 2
+
+	pad := ""
+
+	if len(text) > w {
+		text = "..." + text[len(text)-w+3:] // add ellipsis if text is too long
+	} else {
+		pad = strings.Repeat(" ", w-len(text))
+	}
+
+	as.MoveTo(x, y).Text(strings.TrimSpace(text+pad)).MoveTo(x+len(text), y)
+
+	return as
 }
 
 func (as *ANSIString) LogBox(x, y, w, h int, label string, entries []string, wordWrap bool) *ANSIString {
